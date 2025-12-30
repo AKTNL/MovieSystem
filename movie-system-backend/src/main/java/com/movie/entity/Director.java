@@ -8,10 +8,10 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-@TableName("actor")
-public class Actor {
+@TableName("director")
+public class Director {
     @TableId(type = IdType.AUTO)
-    private Long actorId;
+    private Long directorId;
     private String name;
     private String gender;
     private LocalDate birthDate;
