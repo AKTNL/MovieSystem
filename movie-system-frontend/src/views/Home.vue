@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import request from '../utils/request'
+import { getMovieList } from '../api/movie'
 
 const movieList = ref([])
 
@@ -11,7 +11,7 @@ onMounted(() => {
 
 const loadMovies = () => {
   // 请求后端接口 /movie/list
-  request.get('/movie/list').then(res => {
+  getMovieList().then(res => {
     if (res.code === 200) {
       movieList.value = res.data
       console.log("获取电影成功：", res.data)

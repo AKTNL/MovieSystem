@@ -1,11 +1,15 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router';
-import request from '../utils/request'
 import { ElMessage } from 'element-plus';
+import { getMovieDetail } from '../api/movie';
+import { getReviewList, addReview } from '../api/review';
 
 const route = useRoute()
+
 const movieId = route.params.id // 从网址获取ID
+console.log("当前电影ID:", movieId) 
+
 const user = JSON.parse(localStorage.getItem('user') || '{}')//获取当前登录用户
 
 const movie = ref({})
@@ -27,16 +31,18 @@ onMounted(() => {
 
 //1.加载电影详情
 const loadMovieInfo = () => {
-    request.get('/movie' + movieId).then(res => {
+    getMovieDetail(movieId).then(res => {
         if (res.code === 200) {
             movie.value = res.data
+        } else {
+            ElMessage.error("获取电影详情失败：" + res.msg)
         }
     })
 }
 
 //2.加载评论列表(调用存储过程接口)
 const loadReviews = () => {
-    request.get('/review/list/' + movieId).then(res => {
+    getReviewList(movieId).then(res => {
         if (res.code === 200) {
             reviews.value = res.data
         }
@@ -60,7 +66,7 @@ const submitReview = () => {
         content: myContent.value
     }
 
-    request.post('/review/add', data).then(res => {
+    addReview(data).then(res => {
         if (res.code === 200) {
             ElMessage.success('评论成功！')
             myContent.value = ''
@@ -103,7 +109,7 @@ const submitReview = () => {
                     <div style="display: flex; align-items: center; margin-bottom: 20px;">
                         <span style="font-size: 14px; color: #666; margin-right: 10px;">综合评分：</span>
                         <el-rate
-                            v-model="displayRating"
+                            :model-value="displayRating"
                             disabled
                             show-score
                             text-color="#ff9900"
