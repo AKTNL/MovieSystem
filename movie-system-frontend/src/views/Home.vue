@@ -28,7 +28,12 @@ const loadMovies = () => {
     <!-- 电影列表卡片 -->
     <el-row :gutter="20">
       <el-col :span="6" v-for="movie in movieList" :key="movie.movieId" style="margin-bottom: 20px;">
-        <el-card :body-style="{ padding: '0px' }" shadow="hover">
+        <el-card 
+          :body-style="{ padding: '0px' }" 
+          shadow="hover"
+          style="cursor: pointer"
+          @click="$router.push('/movie/' + movie.movieId)"
+        >
           <img src="https://via.placeholder.com/300x400" class="image" style="width: 100%; display: block;"/>
           <div style="padding: 14px;">
             <span>{{ movie.title }}</span>
