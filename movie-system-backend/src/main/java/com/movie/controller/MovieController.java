@@ -4,10 +4,7 @@ import com.movie.common.Result;
 import com.movie.entity.Movie;
 import com.movie.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,5 +27,26 @@ public class MovieController {
     public Result<Movie> getById(@PathVariable Long id){
         Movie movie = movieService.getById(id);
         return Result.success(movie);
+    }
+
+    //新增电影
+    @PostMapping("/add")
+    public Result<?> add(@RequestBody Movie movie){
+        movieService.save(movie);
+        return Result.success(null);
+    }
+
+    //修改电影
+    @PutMapping("/update")
+    public Result<?> update(@RequestBody Movie movie){
+        movieService.updateById(movie);
+        return Result.success(null);
+    }
+
+    //删除电影
+    @DeleteMapping("/delete/{id}")
+    public Result<?> delete(@PathVariable Long id){
+        movieService.removeById(id);
+        return Result.success(null);
     }
 }

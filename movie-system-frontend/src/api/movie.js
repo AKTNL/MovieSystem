@@ -19,3 +19,8 @@ export function getMovieActors(movieId) {
 export function getMovieDirectors(movieId) {
     return request.get('/directors/' + movieId)
 }
+
+//删除电影
+export function deleteMovie(movieId) {
+    return request.get('/delete/' + movieId)
+}

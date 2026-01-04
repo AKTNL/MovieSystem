@@ -3,6 +3,8 @@ import LoginView from '../views/Login.vue'
 import LayoutView from '../views/Layout.vue'
 import HomeView from '../views/Home.vue'
 import MovieDetailView from '../views/MovieDetail.vue'
+import AdminLayoutView from "../views/admin/AdminLayout.vue";
+import MovieManageView from "../views/admin/MovieManage.vue";
 
 const routes = [
     {
@@ -26,6 +28,28 @@ const routes = [
                 name: 'MovieDetail',
                 component: MovieDetailView
             }
+        ]
+    },
+    {
+        path: '/admin',
+        component: AdminLayoutView,
+        redirect: '/admin/movie',
+        //路由守卫：只有管理员能进
+        beforeEnter: (to, from, next) => {
+            const user = JSON.parse(localStorage.getItem('user') || '{}')
+            if (user.role === 'admin') {
+                next()
+            } else {
+                alert('无权访问')
+                next('/login')
+            }
+        },
+        children: [
+            {
+                path: 'movie',
+                name: 'AdminMovie',
+                component: MovieManageView
+            },
         ]
     }
 ]

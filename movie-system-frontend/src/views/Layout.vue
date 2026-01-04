@@ -1,4 +1,5 @@
 <script setup>
+import { Monitor } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter()
@@ -25,6 +26,16 @@ const logout = () => {
                         <el-icon class="el-icon--right"><arrow-down/></el-icon>
                     </span>
                     <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item
+                                v-if="user.role === 'admin'"
+                                @click="$router.push('/admin')"
+                                style="color: #409EFF; font-weight: bold;"
+                            >
+                                <el-icon><monitor/></el-icon>
+                                后台管理
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
                         <el-dropdown-menu>
                             <el-dropdown-item>个人中心</el-dropdown-item>
                             <el-dropdown-item divided @click="logout">退出登录</el-dropdown-item>

@@ -34,7 +34,7 @@ const loadMovies = () => {
           style="cursor: pointer"
           @click="$router.push('/movie/' + movie.movieId)"
         >
-          <img src="https://via.placeholder.com/300x400" class="image" style="width: 100%; display: block;"/>
+          <img :src="movie.coverUrl" class="movie-poster" style="width: 100%; display: block;"/>
           <div style="padding: 14px;">
             <span>{{ movie.title }}</span>
             <div class="bottom">
@@ -67,6 +67,13 @@ const loadMovies = () => {
 </style>
 
 <style scoped>
+.movie-poster {
+  width: 100%;
+  height: 300px; /* 固定高度 */
+  display: block;
+  object-fit: cover; /* 自动裁剪，保证不变形 */
+  background-color: #f5f7fa;
+}
 .bottom{
   margin-top: 13px;
   line-height: 12px;
