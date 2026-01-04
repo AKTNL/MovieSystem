@@ -25,6 +25,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         //3.设置默认值
         user.setNickname("用户" + System.currentTimeMillis());//默认昵称
+        user.setRole("user");
         user.setStatus(1);
 
         //4.保存

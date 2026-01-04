@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
-import { getMovieDetail } from '../api/movie';
+import { getMovieDetail, getMovieActors, getMovieDirectors } from '../api/movie';
 import { getReviewList, addReview } from '../api/review';
 
 const route = useRoute()
@@ -14,6 +14,9 @@ const user = JSON.parse(localStorage.getItem('user') || '{}')//获取当前登�
 
 const movie = ref({})
 const reviews = ref({})
+
+const actors = ref([])
+const directors = ref([])
 
 //评分相关
 const myScore = ref(0)
@@ -27,9 +30,10 @@ const displayRating = computed(() => {
 onMounted(() => {
     loadMovieInfo()
     loadReviews()
+    loadCast()
 })
 
-//1.加载电影详情
+//加载电影详情
 const loadMovieInfo = () => {
     getMovieDetail(movieId).then(res => {
         if (res.code === 200) {
@@ -40,7 +44,21 @@ const loadMovieInfo = () => {
     })
 }
 
-//2.加载评论列表(调用存储过程接口)
+//加载演职人员
+const loadCast = () => {
+  getMovieActors(movieId).then(res => {
+    if (res.code === 200) actors.value = res.data
+  }).catch(err => {
+        console.error("演员信息加载失败:", err)
+  })
+  getMovieDirectors(movieId).then(res => {
+    if (res.code === 200) directors.value = res.data
+  }).catch(err => {
+        console.error("导演信息加载失败:", err)
+  })
+}
+
+//加载评论列表(调用存储过程接口)
 const loadReviews = () => {
     getReviewList(movieId).then(res => {
         if (res.code === 200) {
@@ -49,7 +67,7 @@ const loadReviews = () => {
     })
 }
 
-//3.提交评论
+//提交评论
 const submitReview = () => {
     if (myScore.value === 0) {
         ElMessage.warning('请先打分')
@@ -123,6 +141,31 @@ const submitReview = () => {
                     </div>
                 </el-col>
             </el-row>
+        </el-card>
+
+        <el-card style="margin-top: 20px;" shadow="never">
+            <template #header>
+                <span style="font-weight: bold;">演职员表</span>
+            </template>
+            
+            <div style="margin-bottom: 10px; font-weight: bold; color: #666;">导演</div>
+            <el-row :gutter="20">
+                <el-col :span="4" v-for="d in directors" :key="d.directorId" style="text-align: center;">
+                <el-avatar :size="80" :src="d.avatarUrl" />
+                <div style="margin-top: 5px;">{{ d.name }}</div>
+                </el-col>
+            </el-row>
+
+            <el-divider />
+
+            <div style="margin-bottom: 10px; font-weight: bold; color: #666;">演员</div>
+            <div style="display: flex; overflow-x: auto; padding-bottom: 10px;">
+                <div v-for="a in actors" :key="a.actorId" style="text-align: center; margin-right: 30px; min-width: 100px;">
+                <el-avatar :size="80" :src="a.avatarUrl" />
+                <div style="margin-top: 5px; font-weight: bold; font-size: 14px;">{{ a.name }}</div>
+                <div style="font-size: 12px; color: #999;">饰 {{ a.roleName }}</div>
+                </div>
+            </div>
         </el-card>
 
         <!--2.打分与评论输入框-->

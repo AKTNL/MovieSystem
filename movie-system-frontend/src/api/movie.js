@@ -9,3 +9,13 @@ export function getMovieList() {
 export function getMovieDetail(id) {
     return request.get('/movie/' + id)
 }
+
+// 获取演员列表
+export function getMovieActors(movieId) {
+    return request.get('/actors/' + movieId)
+}
+
+// 获取导演列表
+export function getMovieDirectors(movieId) {
+    return request.get('/directors/' + movieId)
+}

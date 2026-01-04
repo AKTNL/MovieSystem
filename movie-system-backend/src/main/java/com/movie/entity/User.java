@@ -20,4 +20,5 @@ public class User {
     private String phone;
     private Integer status; //0:禁用 1:正常
     private LocalDateTime createTime;
+    private String role; // user 或 admin
 }
