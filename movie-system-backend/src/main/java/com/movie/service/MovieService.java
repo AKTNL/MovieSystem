@@ -4,4 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.movie.entity.Movie;
 
 public interface MovieService extends IService<Movie> {
+    //新增带有演职员的电影
+    void saveMovie(Movie movie);
+    //修改带有演职员的电影
+    void updateMovie(Movie movie);
 }

@@ -1,16 +1,22 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { getMovieList, deleteMovie } from '../../api/movie';
+import { getMovieList, deleteMovie, getMovieActors, getMovieDirectors } from '../../api/movie';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import ImageUpload from '../../components/ImageUpload.vue';
 import request from '../../utils/request';
+import { getAllActors } from '../../api/actor';
+import { getAllDirectors } from '../../api/director';
 
 const tableData = ref([])
 const dialogVisible = ref(false)
 const form = reactive({})
 
+const allActors = ref([])
+const allDirectors = ref([])
+
 onMounted(() => {
     load()
+    loadOptions() //加载下拉框数据
 })
 
 const load = () => {
@@ -21,10 +27,15 @@ const load = () => {
     })
 }
 
+const loadOptions = () => { 
+    getAllActors().then(res => allActors.value = res.data)
+    getAllDirectors().then(res => allDirectors.value = res.data)
+}
+
 //点击新增
 const handleAdd = () => {
     //清空表单
-    Object.keys(form).forEach(key => delete from[key])
+    Object.keys(form).forEach(key => delete form[key])
     dialogVisible.value = true
 }
 
@@ -32,6 +43,15 @@ const handleAdd = () => {
 const handleEdit = (row) => {
     //复制到当前数据到表单
     Object.assign(form, row)
+
+    getMovieActors(row.movieId).then(res => {
+        form.actorIds = res.data.map(item => item.actorId)
+    })
+
+    getMovieDirectors(row.movieId).then(res => {
+        form.directorIds = res.data.map(item => item.directorId)
+    })
+
     dialogVisible.value = true
 }
 
@@ -86,7 +106,10 @@ const handleDelete = (id) => {
             </el-table-column>
             <el-table-column prop="title" label="电影名称"/>
             <el-table-column prop="releaseYear" label="年份" width="80"/>
+            <el-table-column prop="duration" label="时长" width="80"/>
             <el-table-column prop="genre" label="类型" width="100"/>
+            <el-table-column prop="language" label="语言" width="80"/>
+            <el-table-column prop="country" label="国家/地区" width="100"/>
             <el-table-column prop="rating" label="评分" width="80" sortable/>
             <el-table-column label="操作" width="180">
                 <template #default="scope">
@@ -105,6 +128,26 @@ const handleDelete = (id) => {
                 <el-form-item label="封面图">
                     <ImageUpload v-model="form.coverUrl"/>
                 </el-form-item>
+                <el-form-item label="导演">
+                    <el-select v-model="form.directorIds" multiple placeholder="请选择导演" style="width: 100%;">
+                        <el-option
+                            v-for="item in allDirectors"
+                            :key="item.directorId"
+                            :label="item.name"
+                            :value="item.directorId"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="演员">
+                    <el-select v-model="form.actorIds" multiple filterable placeholder="请选择演员（可搜索）" style="width: 100%;">
+                        <el-option
+                            v-for="item in allActors"
+                            :key="item.actorId"
+                            :label="item.name"
+                            :value="item.actorId"
+                        />
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="年份">
                     <el-input-number v-model="form.releaseYear" :min="1900" :max="2030"/>
                 </el-form-item>
@@ -113,6 +156,12 @@ const handleDelete = (id) => {
                 </el-form-item>
                 <el-form-item label="类型">
                     <el-input v-model="form.genre" placeholder="如：剧情，动作"/>
+                </el-form-item>
+                <el-form-item label="语言">
+                    <el-input v-model="form.language" placeholder="如：英语，中文"/>
+                </el-form-item>
+                <el-form-item label="国家/地区">
+                    <el-input v-model="form.country" placeholder="如：美国，中国"/>
                 </el-form-item>
                 <el-form-item label="简介">
                     <el-input v-model="form.synopsis" type="textarea"/>

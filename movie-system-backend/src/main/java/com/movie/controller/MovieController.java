@@ -32,14 +32,14 @@ public class MovieController {
     //新增电影
     @PostMapping("/add")
     public Result<?> add(@RequestBody Movie movie){
-        movieService.save(movie);
+        movieService.saveMovie(movie);
         return Result.success(null);
     }
 
     //修改电影
     @PutMapping("/update")
     public Result<?> update(@RequestBody Movie movie){
-        movieService.updateById(movie);
+        movieService.updateMovie(movie);
         return Result.success(null);
     }
 

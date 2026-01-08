@@ -1,12 +1,14 @@
 package com.movie.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @TableName("movie")
@@ -24,4 +26,10 @@ public class Movie {
     private BigDecimal rating;
     private Integer ratingCount;
     private LocalDateTime createTime;
+
+    //用于接收前端传来的ID数组
+    @TableField(exist = false) // 告诉MyBatis这是非数据库字段
+    private List<Long> actorIds;
+    @TableField(exist = false) // 告诉MyBatis这是非数据库字段
+    private List<Long> directorIds;
 }
