@@ -1,8 +1,8 @@
 import request from "../utils/request";
 
 //获取电影列表
-export function getMovieList() {
-    return request.get('/movie/list')
+export function getMovieList(params) {
+    return request.get('/movie/list', { params: params })
 }
 
 //获取电影详情
@@ -23,4 +23,8 @@ export function getMovieDirectors(movieId) {
 //删除电影
 export function deleteMovie(movieId) {
     return request.get('/delete/' + movieId)
+}
+
+export function getHotMovies() {
+    return request.get('/movie/hot')
 }
