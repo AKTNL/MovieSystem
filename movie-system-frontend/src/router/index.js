@@ -5,6 +5,7 @@ import HomeView from '../views/Home.vue'
 import MovieDetailView from '../views/MovieDetail.vue'
 import AdminLayoutView from "../views/admin/AdminLayout.vue";
 import MovieManageView from "../views/admin/MovieManage.vue";
+import DashboardView from "../views/admin/Dashboard.vue";
 
 const routes = [
     {
@@ -33,7 +34,7 @@ const routes = [
     {
         path: '/admin',
         component: AdminLayoutView,
-        redirect: '/admin/movie',
+        redirect: '/admin/dashboard',
         //路由守卫：只有管理员能进
         beforeEnter: (to, from, next) => {
             const user = JSON.parse(localStorage.getItem('user') || '{}')
@@ -45,6 +46,11 @@ const routes = [
             }
         },
         children: [
+            {
+                path: 'dashboard',
+                name: 'Dashboard',
+                component: DashboardView
+            },
             {
                 path: 'movie',
                 name: 'AdminMovie',

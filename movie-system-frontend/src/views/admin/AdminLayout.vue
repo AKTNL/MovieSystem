@@ -26,6 +26,10 @@ const logout = () => {
                     router
                     :default-active="$route.path"
                 >
+                    <el-menu-item index="/admin/dashboard">
+                        <el-icon><Odometer /></el-icon>
+                        <span>数据大屏</span>
+                    </el-menu-item>
                     <el-menu-item index="/admin/movie">
                         <el-icon><Film /></el-icon>
                         <span>电影管理</span>
