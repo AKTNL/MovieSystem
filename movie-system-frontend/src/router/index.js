@@ -6,6 +6,7 @@ import MovieDetailView from '../views/MovieDetail.vue'
 import AdminLayoutView from "../views/admin/AdminLayout.vue";
 import MovieManageView from "../views/admin/MovieManage.vue";
 import DashboardView from "../views/admin/Dashboard.vue";
+import UserCenterView from "../views/user/UserCenter.vue";
 
 const routes = [
     {
@@ -28,6 +29,11 @@ const routes = [
                 path: '/movie/:id',
                 name: 'MovieDetail',
                 component: MovieDetailView
+            },
+            {
+                path: 'user-center',
+                name: 'UserCenter',
+                component: UserCenterView
             }
         ]
     },

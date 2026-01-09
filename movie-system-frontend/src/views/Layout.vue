@@ -1,5 +1,5 @@
 <script setup>
-import { Monitor } from '@element-plus/icons-vue';
+import { Monitor, User } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter()
@@ -37,7 +37,7 @@ const logout = () => {
                             </el-dropdown-item>
                         </el-dropdown-menu>
                         <el-dropdown-menu>
-                            <el-dropdown-item>个人中心</el-dropdown-item>
+                            <el-dropdown-item @click="$router.push('/user-center')"><el-icon><User/></el-icon>个人中心</el-dropdown-item>
                             <el-dropdown-item divided @click="logout">退出登录</el-dropdown-item>
                         </el-dropdown-menu>
                     </template>

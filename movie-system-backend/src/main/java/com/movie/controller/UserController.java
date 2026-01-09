@@ -6,10 +6,7 @@ import com.movie.entity.User;
 import com.movie.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -63,5 +60,23 @@ public class UserController {
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
+    }
+
+    @PutMapping("/update")
+    public Result<?> update(@RequestBody User user){
+        //用户不能修改自己的username和role
+        user.setUsername(null);
+        user.setRole(null);
+        user.setPassword(null);
+        userService.updateById(user);
+        return Result.success(null);
+    }
+
+    //根据Token(或ID)获取最新用户信息
+    @GetMapping("/{id}")
+    public Result<User> getInfo(@PathVariable Long id){
+        User user = userService.getById(id);
+        user.setPassword(null); //敏感信息不返回
+        return Result.success(user);
     }
 }

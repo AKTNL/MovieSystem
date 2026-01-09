@@ -9,3 +9,11 @@ export function login(data) {
 export function register(data) {
     return request.post('/user/register', data)
 }
+
+export function userUpdate(from) {
+    return request.put('/user/update', from)
+}
+
+export function getUserInfo(userId) {
+    return request.get('/user/' + userId)
+}
