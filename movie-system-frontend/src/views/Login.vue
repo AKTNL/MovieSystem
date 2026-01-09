@@ -1,8 +1,9 @@
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { login, register } from '../api/user';
+import { getCaptchaApi } from '../api/captcha';
 
 const router = useRouter()
 const isLogin = ref(true) //控制登录注册切换
@@ -10,8 +11,25 @@ const isLogin = ref(true) //控制登录注册切换
 //表单数据
 const loginForm = reactive({
     username: '',
-    password: ''
+    password: '',
+    code: '',
+    uuid: ''
 })
+
+const captchaImg = ref('') 
+//页面加载时获取验证码
+onMounted(() => {
+    getCaptcha()
+})
+
+const getCaptcha = () => { 
+    getCaptchaApi().then(res => { 
+        if (res.code === 200) {
+            captchaImg.value = res.data.image
+            loginForm.uuid = res.data.uuid
+        }
+    })
+}
 
 const registerForm = reactive({
     username: '',
@@ -43,6 +61,7 @@ const handleLogin = () => {
             router.push('/') // 跳转到首页
         } else {
             ElMessage.error(res.msg)
+            getCaptcha()
         }
     })
 }
@@ -77,6 +96,13 @@ const handleRegister = () => {
                 </el-form-item>
                 <el-form-item prop="password">
                     <el-input v-model="loginForm.password" type="password" placeholder="请输入密码" prefix-icon="Lock" show-password/>
+                </el-form-item>
+                <!--验证码区域-->
+                <el-form-item prop="code">
+                    <div style="display: flex; width: 100%;">
+                        <el-input v-model="loginForm.code" placeholder="请输入验证码" prefix-icon="key" style="flex: 1; margin-right: 10px;"/>
+                        <img :src="captchaImg" @click="getCaptcha" style="width: 100px; height: 32px; cursor: pointer; border: 1px solid #dcdfe6; border-radius: 4px;" title="点击刷新"/>
+                    </div>
                 </el-form-item>
                 <el-button type="primary" style="width: 100%" @click="handleLogin">登 录</el-button>
                 <div style="text-align: right; margin-top: 10px;">
