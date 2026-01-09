@@ -2,6 +2,7 @@ package com.movie.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.movie.entity.PasswordDto;
 import com.movie.entity.User;
 import com.movie.mapper.UserMapper;
 import com.movie.service.UserService;
@@ -53,5 +54,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         //4.登录成功，返回用户信息
         user.setPassword(null);
         return user;
+    }
+
+    @Override
+    public void updatePassword(PasswordDto passwordDto){
+        //1.查用户
+        User user = getById(passwordDto.getUserId());
+        if(user == null){
+            throw new RuntimeException("用户不存在");
+        }
+
+        //2.校验旧密码
+        String md5Input = DigestUtils.md5DigestAsHex(passwordDto.getOldPassword().getBytes());
+        if(!md5Input.equals(user.getPassword())){
+            throw new RuntimeException("旧密码错误");
+        }
+
+        //3.设置新密码
+        String md5NewPassword = DigestUtils.md5DigestAsHex(passwordDto.getNewPassword().getBytes());
+        user.setPassword(md5NewPassword);
+
+        updateById(user);
     }
 }

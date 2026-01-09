@@ -2,6 +2,7 @@ package com.movie.controller;
 
 import com.movie.common.Result;
 import com.movie.entity.LoginDto;
+import com.movie.entity.PasswordDto;
 import com.movie.entity.User;
 import com.movie.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,5 +79,15 @@ public class UserController {
         User user = userService.getById(id);
         user.setPassword(null); //敏感信息不返回
         return Result.success(user);
+    }
+
+    @PostMapping("/password")
+    public Result<?> updatePassword(@RequestBody PasswordDto passwordDto) {
+        try{
+            userService.updatePassword(passwordDto);
+            return Result.success(null);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
     }
 }

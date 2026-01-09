@@ -1,3 +1,4 @@
+import { pa } from "element-plus/es/locales.mjs";
 import request from "../utils/request";
 
 //登录
@@ -16,4 +17,8 @@ export function userUpdate(from) {
 
 export function getUserInfo(userId) {
     return request.get('/user/' + userId)
+}
+
+export function updatePassword(params) {
+    return request.post('/user/password', params)
 }
