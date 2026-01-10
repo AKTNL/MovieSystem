@@ -2,11 +2,17 @@
 import { Monitor, User } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 import { ref } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
+import { ElNotification } from 'element-plus';
 
 const router = useRouter()
+
+let socket = null
+
 // 从缓存获取用户信息，如果没有则为空对象
 const user = JSON.parse(localStorage.getItem('user') || '{}')
 const logout = () => {
+    if (socket) socket.close() // 退出时断开
     localStorage.removeItem('user')
     router.push('/login')
 }
@@ -16,6 +22,66 @@ const handleSearch = () => {
   if (searchKeyword.value) {
     router.push({ path: '/search', query: { q: searchKeyword.value } })
   }
+}
+
+const socketUrl = `ws://localhost:8080/ws/${user.userId}`
+
+onMounted(() => { 
+    // 只有登录用户才连接 WebSocket
+    if (user.userId) {
+        initWebSocket()
+    }
+})
+
+onUnmounted(() => {
+  if (socket) {
+    socket.close()
+  }
+})
+
+const initWebSocket = () => {
+    if (typeof (WebSocket) === "undefined") {
+        console.log("您的浏览器不支持WebSocket")
+        return
+    }
+
+    socket = new WebSocket(socketUrl)
+
+    socket.onopen = () => {
+        console.log("WebSocket连接成功")
+    }
+
+    const msgCount = ref(0)
+    const msgList = ref([]) // 存历史消息
+
+    socket.onmessage = (msg) => {
+        msgCount.value++
+        msgList.value.push(msg.data)
+        console.log("收到消息:", msg.data)
+        // 收到消息后，弹出 ElementPlus 的通知框
+        ElNotification({
+        title: '系统通知',
+        message: msg.data,
+        type: 'info',
+        duration: 5000 // 5秒后自动关闭
+        })
+    }
+
+    socket.onclose = () => {
+        console.log("WebSocket连接关闭")
+    }
+
+    socket.onerror = () => {
+        console.log("WebSocket连接发生错误")
+    }
+
+    const showMsgBox = () => {
+        // 点击铃铛，清空数字，展示消息列表（可以用 Drawer 或 Dialog）
+        msgCount.value = 0
+        ElMessageBox.alert(msgList.value.join('<br>'), '历史消息', {
+            dangerouslyUseHTMLString: true
+        })
+    }
 }
 </script>
 
@@ -56,6 +122,11 @@ const handleSearch = () => {
                         </el-dropdown-menu>
                     </template>
                 </el-dropdown>
+            </div>
+            <div style="margin-right: 20px;">
+                <el-badge :value="msgCount" :hidden="msgCount === 0" class="item">
+                    <el-button circle icon="Bell" @click="showMsgBox" />
+                </el-badge>
             </div>
         </el-header>
 
