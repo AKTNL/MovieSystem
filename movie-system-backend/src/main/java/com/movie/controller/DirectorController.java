@@ -1,14 +1,12 @@
 package com.movie.controller;
 
+import com.movie.common.Auth;
 import com.movie.common.Result;
 import com.movie.entity.Director;
 import com.movie.mapper.DirectorMapper;
 import com.movie.service.DirectorService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,5 +29,29 @@ public class DirectorController {
     @GetMapping("/{movieId}")
     public Result<List<Director>> getDirectors(@PathVariable Long movieId) {
         return Result.success(directorMapper.selectDirectorsByMovieId(movieId));
+    }
+
+    //新增导演
+    @Auth("admin")
+    @PostMapping("/add")
+    public Result<?> add(@RequestBody Director director){
+        directorService.save(director);
+        return Result.success(null);
+    }
+
+    //修改导演
+    @Auth("admin")
+    @PutMapping("/update")
+    public Result<?> update(@RequestBody Director director){
+        directorService.updateById(director);
+        return Result.success(null);
+    }
+
+    //删除导演
+    @Auth("admin")
+    @DeleteMapping("/delete/{id}")
+    public Result<?> delete(@PathVariable Long id){
+        directorService.removeById(id);
+        return Result.success(null);
     }
 }

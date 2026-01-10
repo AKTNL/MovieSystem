@@ -1,5 +1,6 @@
 package com.movie.controller;
 
+import com.movie.common.Auth;
 import com.movie.common.Result;
 import com.movie.entity.LoginDto;
 import com.movie.entity.PasswordDto;
@@ -8,6 +9,8 @@ import com.movie.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -89,5 +92,20 @@ public class UserController {
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
+    }
+
+    //获取所有用户
+    @Auth("admin")
+    @GetMapping("/list")
+    public Result<List<User>> list(){
+        return Result.success(userService.list());
+    }
+
+    //删除用户
+    @Auth("admin")
+    @DeleteMapping("/delete/{id}")
+    public Result<?> delete(@PathVariable Long id){
+        userService.removeById(id);
+        return Result.success(null);
     }
 }

@@ -7,6 +7,10 @@ import AdminLayoutView from "../views/admin/AdminLayout.vue";
 import MovieManageView from "../views/admin/MovieManage.vue";
 import DashboardView from "../views/admin/Dashboard.vue";
 import UserCenterView from "../views/user/UserCenter.vue";
+import ActorManageView from "../views/admin/ActorManage.vue";
+import DirectorManageView from "../views/admin/DirectorManage.vue";
+import UserManageView from "../views/admin/UserManage.vue";
+import ReviewManageView from "../views/admin/ReviewManage.vue";
 
 const routes = [
     {
@@ -62,6 +66,26 @@ const routes = [
                 name: 'AdminMovie',
                 component: MovieManageView
             },
+            {
+                path: 'actor',
+                name: 'ActorManage',
+                component: ActorManageView
+            },
+            {
+                path: 'director',
+                name: 'DirectorManage',
+                component: DirectorManageView
+            },
+            {
+                path: 'user',
+                name: 'UserManage',
+                component: UserManageView
+            },
+            {
+                path: 'review',
+                name: 'ReviewManage',
+                component: ReviewManageView
+            }
         ]
     }
 ]

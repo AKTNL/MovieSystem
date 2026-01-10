@@ -46,6 +46,10 @@ const logout = () => {
                         <el-icon><Avatar /></el-icon>
                         <span>用户管理</span>
                     </el-menu-item>
+                    <el-menu-item index="/admin/review">
+                        <el-icon><Message /></el-icon>
+                        <span>评论管理</span>
+                    </el-menu-item>
                     <el-menu-item index="/">
                         <el-icon><HomeFilled /></el-icon>
                         <span>返回前台</span>

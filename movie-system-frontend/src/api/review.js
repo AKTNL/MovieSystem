@@ -9,3 +9,13 @@ export function getReviewList(movieId) {
 export function addReview(data) {
     return request.post('/review/add', data)
 }
+
+//删除评论
+export function deleteReview(reviewId) {
+    return request.delete('/review/delete/' + reviewId)
+}
+
+//管理员获取所有评论
+export function getAllReviews() {
+    return request.get('/review/listAll')
+}

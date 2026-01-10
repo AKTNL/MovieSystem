@@ -22,7 +22,7 @@ export function getMovieDirectors(movieId) {
 
 //删除电影
 export function deleteMovie(movieId) {
-    return request.get('/delete/' + movieId)
+    return request.delete('/delete/' + movieId)
 }
 
 export function getHotMovies() {

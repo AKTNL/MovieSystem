@@ -22,3 +22,11 @@ export function getUserInfo(userId) {
 export function updatePassword(params) {
     return request.post('/user/password', params)
 }
+
+export function getAllUsers() {
+    return request.get('/user/list')
+}
+
+export function deleteUser(userId) {
+    return request.delete('/user/' + userId)
+}
