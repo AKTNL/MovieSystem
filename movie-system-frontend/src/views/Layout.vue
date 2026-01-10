@@ -1,6 +1,7 @@
 <script setup>
 import { Monitor, User } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
+import { ref } from 'vue'
 
 const router = useRouter()
 // 从缓存获取用户信息，如果没有则为空对象
@@ -8,6 +9,13 @@ const user = JSON.parse(localStorage.getItem('user') || '{}')
 const logout = () => {
     localStorage.removeItem('user')
     router.push('/login')
+}
+
+const searchKeyword = ref('')
+const handleSearch = () => {
+  if (searchKeyword.value) {
+    router.push({ path: '/search', query: { q: searchKeyword.value } })
+  }
 }
 </script>
 
@@ -17,7 +25,13 @@ const logout = () => {
         <el-header style="border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
             <div style="font-size: 20px; font-weight: bold; color: #409EFF">🎬 电影评分系统</div>
             <div style="flex: 1; margin: 0 40px;">
-                <el-input placeholder="搜索电影..." prefix-icon="Search" style="width: 300px"/>
+                <el-input 
+                    v-model="searchKeyword" 
+                    placeholder="搜电影、影人..." 
+                    prefix-icon="Search" 
+                    style="width: 300px" 
+                    @keyup.enter="handleSearch" 
+                />
             </div>
             <div>
                 <el-dropdown>

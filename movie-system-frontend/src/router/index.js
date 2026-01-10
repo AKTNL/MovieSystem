@@ -13,6 +13,7 @@ import UserManageView from "../views/admin/UserManage.vue";
 import ReviewManageView from "../views/admin/ReviewManage.vue";
 import ActorDetailView from "../views/ActorDetail.vue";
 import DirectorDetailView from "../views/DirectorDetail.vue";
+import SearchResultView from "../views/SearchResult.vue";
 
 const routes = [
     {
@@ -50,6 +51,11 @@ const routes = [
                 path: '/director/:id',
                 name: 'DirectorDetail',
                 component: DirectorDetailView
+            },
+            {
+                path: '/search',
+                name: 'SearchResult',
+                component: SearchResultView
             }
         ]
     },
