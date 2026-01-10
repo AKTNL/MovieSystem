@@ -1,6 +1,7 @@
 package com.movie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.movie.common.Auth;
 import com.movie.common.Result;
 import com.movie.entity.Movie;
 import com.movie.service.MovieService;
@@ -47,6 +48,7 @@ public class MovieController {
     }
 
     //新增电影
+    @Auth("admin")
     @PostMapping("/add")
     public Result<?> add(@RequestBody Movie movie){
         movieService.saveMovie(movie);
@@ -54,6 +56,7 @@ public class MovieController {
     }
 
     //修改电影
+    @Auth("admin")
     @PutMapping("/update")
     public Result<?> update(@RequestBody Movie movie){
         movieService.updateMovie(movie);
@@ -61,6 +64,7 @@ public class MovieController {
     }
 
     //删除电影
+    @Auth("admin")
     @DeleteMapping("/delete/{id}")
     public Result<?> delete(@PathVariable Long id){
         movieService.removeById(id);
