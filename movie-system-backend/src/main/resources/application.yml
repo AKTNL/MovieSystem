@@ -9,6 +9,9 @@ spring:
     password: ck041121
     type: com.alibaba.druid.pool.DruidDataSource
 
+  elasticsearch:
+    uris: http://localhost:9200
+
   data:
     redis:
       host: localhost

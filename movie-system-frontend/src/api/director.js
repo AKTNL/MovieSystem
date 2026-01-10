@@ -13,5 +13,9 @@ export function updateDirector(data) {
 }
 
 export function deleteDirector(directorId) {
-    return request.delete('/directors/delete', { directorId })
+    return request.delete('/directors/delete/' + directorId)
+}
+
+export function getDirectorDetail(directorId) {
+    return request.get('/directors/detail/' + directorId)
 }

@@ -15,3 +15,7 @@ export function updateActor(actor) {
 export function deleteActor(id) {
     return request.delete('/actors/delete/' + id)
 }
+
+export function getActorDetail(id) {
+    return request.get('/actors/detail/' + id)
+}

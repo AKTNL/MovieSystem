@@ -150,7 +150,7 @@ const submitReview = () => {
             
             <div style="margin-bottom: 10px; font-weight: bold; color: #666;">导演</div>
             <el-row :gutter="20">
-                <el-col :span="4" v-for="d in directors" :key="d.directorId" style="text-align: center;">
+                <el-col :span="4" v-for="d in directors" :key="d.directorId" style="text-align: center;" @click="$router.push('/director/' + d.directorId)">
                 <el-avatar :size="80" :src="d.avatarUrl" />
                 <div style="margin-top: 5px;">{{ d.name }}</div>
                 </el-col>
@@ -160,7 +160,7 @@ const submitReview = () => {
 
             <div style="margin-bottom: 10px; font-weight: bold; color: #666;">演员</div>
             <div style="display: flex; overflow-x: auto; padding-bottom: 10px;">
-                <div v-for="a in actors" :key="a.actorId" style="text-align: center; margin-right: 30px; min-width: 100px;">
+                <div v-for="a in actors" :key="a.actorId" style="text-align: center; margin-right: 30px; min-width: 100px;" @click="$router.push('/actor/' + a.actorId)">
                 <el-avatar :size="80" :src="a.avatarUrl" />
                 <div style="margin-top: 5px; font-weight: bold; font-size: 14px;">{{ a.name }}</div>
                 <div style="font-size: 12px; color: #999;">饰 {{ a.roleName }}</div>

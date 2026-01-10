@@ -3,12 +3,16 @@ package com.movie.controller;
 import com.movie.common.Auth;
 import com.movie.common.Result;
 import com.movie.entity.Director;
+import com.movie.entity.Movie;
 import com.movie.mapper.DirectorMapper;
+import com.movie.mapper.MovieMapper;
 import com.movie.service.DirectorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/directors")
@@ -18,6 +22,9 @@ public class DirectorController {
 
     @Autowired
     private DirectorMapper directorMapper;
+
+    @Autowired
+    private MovieMapper movieMapper;
 
     @GetMapping("/list")
     public Result<List<Director>> list(){
@@ -53,5 +60,19 @@ public class DirectorController {
     public Result<?> delete(@PathVariable Long id){
         directorService.removeById(id);
         return Result.success(null);
+    }
+
+    // 获取导演详情 + 执导电影
+    @GetMapping("/detail/{id}")
+    public Result<Map<String, Object>> getDirectorDetail(@PathVariable Long id) {
+        Director director = directorService.getById(id);
+        if (director == null) return Result.error("导演不存在");
+
+        List<Movie> movies = movieMapper.selectMoviesByDirectorId(id);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("director", director);
+        map.put("movies", movies);
+        return Result.success(map);
     }
 }

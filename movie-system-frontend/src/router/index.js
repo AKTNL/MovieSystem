@@ -11,6 +11,8 @@ import ActorManageView from "../views/admin/ActorManage.vue";
 import DirectorManageView from "../views/admin/DirectorManage.vue";
 import UserManageView from "../views/admin/UserManage.vue";
 import ReviewManageView from "../views/admin/ReviewManage.vue";
+import ActorDetailView from "../views/ActorDetail.vue";
+import DirectorDetailView from "../views/DirectorDetail.vue";
 
 const routes = [
     {
@@ -38,6 +40,16 @@ const routes = [
                 path: 'user-center',
                 name: 'UserCenter',
                 component: UserCenterView
+            },
+            {
+                path: '/actor/:id',
+                name: 'ActorDetail',
+                component: ActorDetailView
+            },
+            {
+                path: '/director/:id',
+                name: 'DirectorDetail',
+                component: DirectorDetailView
             }
         ]
     },
