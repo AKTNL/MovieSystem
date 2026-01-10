@@ -27,9 +27,11 @@ public class MovieServiceImpl extends ServiceImpl<MovieMapper, Movie> implements
         save(movie);
 
         // 2.保存电影和演员的关联关系
-        if(movie.getActorIds() != null){
-            for(Long actorId : movie.getActorIds()){
-                movieActorMapper.insert(new MovieActor(movie.getMovieId(), actorId));
+        if(movie.getActorList() != null){
+            for(Movie.MovieActorParam param : movie.getActorList()){
+                MovieActor ma = new MovieActor(movie.getMovieId(), param.getActorId());
+                ma.setRoleName(param.getRoleName()); // 设置角色名
+                movieActorMapper.insert(ma);
             }
         }
 
@@ -53,9 +55,11 @@ public class MovieServiceImpl extends ServiceImpl<MovieMapper, Movie> implements
         movieActorMapper.delete(actorWrapper);
 
         // 插入新演员
-        if(movie.getActorIds() != null){
-            for(Long actorId : movie.getActorIds()){
-                movieActorMapper.insert(new MovieActor(movie.getMovieId(), actorId));
+        if(movie.getActorList() != null){
+            for(Movie.MovieActorParam param : movie.getActorList()){
+                MovieActor ma = new MovieActor(movie.getMovieId(), param.getActorId());
+                ma.setRoleName(param.getRoleName());
+                movieActorMapper.insert(ma);
             }
         }
 

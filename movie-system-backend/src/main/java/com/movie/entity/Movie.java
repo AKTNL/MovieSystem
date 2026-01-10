@@ -29,7 +29,14 @@ public class Movie {
 
     //用于接收前端传来的ID数组
     @TableField(exist = false) // 告诉MyBatis这是非数据库字段
-    private List<Long> actorIds;
+    private List<MovieActorParam> actorList;
     @TableField(exist = false) // 告诉MyBatis这是非数据库字段
     private List<Long> directorIds;
+
+    // 定义内部类用于接收参数
+    @Data
+    public static class MovieActorParam {
+        private Long actorId;
+        private String roleName;
+    }
 }

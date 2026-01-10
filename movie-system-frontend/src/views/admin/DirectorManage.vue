@@ -94,7 +94,7 @@ const handleDelete = (id) => {
       <el-table-column label="操作" width="180">
         <template #default="scope">
           <el-button size="small" @click="handleEdit(scope.row)">编辑</el-button>
-          <el-button size="small" type="danger" @click="handleDelete(scope.row.actorId)">删除</el-button>
+          <el-button size="small" type="danger" @click="handleDelete(scope.row.directorId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

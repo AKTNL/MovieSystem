@@ -26,46 +26,67 @@ const loadStats = () => {
 const initGenreChart = (data) => { 
     //获取DOM元素
     const chartDom = document.getElementById('genreChart')
+
     const myChart = echarts.init(chartDom)
 
     const option = {
-        tooltip: {
-            trigger: 'item'
+    // 【优化1】自定义配色：清新风格
+    color: [
+      '#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', 
+      '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc'
+    ],
+    title: {
+      text: '类型分布',
+      left: 'center',
+      top: 'center',
+      textStyle: { color: '#999', fontSize: 14 }
+    },
+    tooltip: {
+      trigger: 'item',
+      // 【优化2】显示百分比：剧情: 10 (25%)
+      formatter: '{b}: {c} ({d}%)' 
+    },
+    legend: {
+      type: 'scroll', // 【优化3】如果类型还是很多，允许图例滚动
+      bottom: '0%',
+      left: 'center'
+    },
+    series: [
+      {
+        name: '电影类型',
+        type: 'pie',
+        radius: ['40%', '70%'], // 甜甜圈
+        avoidLabelOverlap: true, // 防止标签重叠
+        itemStyle: {
+          borderRadius: 10, // 圆角扇形
+          borderColor: '#fff',
+          borderWidth: 2
         },
-        legend: {
-            top: '5%',
-            left: 'center'
+        label: {
+          show: true,
+          formatter: '{b}' // 默认只显示名字，鼠标放上去显示详情
         },
-        series: [
-            {
-                name: '电影类型',
-                type: 'pie',
-                radius: ['40%', '70%'],
-                avoidLabelOverlap: false,
-                itemStyle: {
-                    borderRadius: 10,
-                    borderColor: '#fff',
-                    borderWidth: 2
-                },
-                label: {
-                    show: false,
-                    position: 'center'
-                },
-                emphasis: {
-                    label: {
-                        show: true,
-                        fontSize: '20',
-                        fontWeight: 'bold'
-                    }  
-                },
-                labelLine: {
-                    show: false
-                },
-                data: data
-            }
-        ]
-    }
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: 16,
+            fontWeight: 'bold'
+          },
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0, 0, 0, 0.5)'
+          }
+        },
+        data: data
+      }
+    ]
+  }
     myChart.setOption(option)
+    // 跟随窗口大小自动缩放
+    window.addEventListener('resize', () => {
+    myChart.resize()
+  })
 }
 </script>
 

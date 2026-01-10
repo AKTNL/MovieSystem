@@ -9,7 +9,10 @@ import { getAllDirectors } from '../../api/director';
 
 const tableData = ref([])
 const dialogVisible = ref(false)
-const form = reactive({})
+const form = reactive({
+    directorIds: [],
+    actorList: [],
+})
 
 const allActors = ref([])
 const allDirectors = ref([])
@@ -32,10 +35,23 @@ const loadOptions = () => {
     getAllDirectors().then(res => allDirectors.value = res.data)
 }
 
+//添加一行演员
+const addActorRow = () => {
+    if (!form.actorList) form.actorList = []
+    form.actorList.push({ actorId: null, roleName: '' })
+}
+
+//删除一行演员
+const removeActorRow = (index) => {
+    form.actorList.splice(index, 1)
+}
+
 //点击新增
 const handleAdd = () => {
     //清空表单
     Object.keys(form).forEach(key => delete form[key])
+    form.directorIds = []
+    form.actorList = [] //新增时清空演员列表
     dialogVisible.value = true
 }
 
@@ -44,12 +60,16 @@ const handleEdit = (row) => {
     //复制到当前数据到表单
     Object.assign(form, row)
 
-    getMovieActors(row.movieId).then(res => {
-        form.actorIds = res.data.map(item => item.actorId)
-    })
-
     getMovieDirectors(row.movieId).then(res => {
         form.directorIds = res.data.map(item => item.directorId)
+    })
+
+    //回显演员：现在需要同时回显 ID 和 角色名
+    getMovieActors(row.movieId).then(res => {
+        form.actorList = res.data.map(item => ({
+            actorId: item.actorId,
+            roleName: item.roleName
+        }))
     })
 
     dialogVisible.value = true
@@ -77,7 +97,7 @@ const handleDelete = (id) => {
     ElMessageBox.confirm('确定要删除这部电影吗？', '提示', {
         type: 'warning'
     }).then(() => {
-        deleteMovie().then(res => {
+        deleteMovie(id).then(res => {
             if (res.code === 200) {
                 ElMessage.success('删除成功')
                 load()
@@ -138,15 +158,38 @@ const handleDelete = (id) => {
                         />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="演员">
-                    <el-select v-model="form.actorIds" multiple filterable placeholder="请选择演员（可搜索）" style="width: 100%;">
-                        <el-option
-                            v-for="item in allActors"
-                            :key="item.actorId"
-                            :label="item.name"
-                            :value="item.actorId"
-                        />
-                    </el-select>
+                <!-- 演员为动态添加列表模式 -->
+                <el-form-item label="演员阵容">
+                    <div style="width: 100%">
+                        <el-button type="success" size="small" icon="Plus" @click="addActorRow" style="margin-bottom: 5px;">添加演员</el-button>
+                        
+                        <el-table :data="form.actorList" border size="small">
+                            <el-table-column label="演员" width="160">
+                                <template #default="scope">
+                                    <el-select v-model="scope.row.actorId" placeholder="选择演员" filterable style="width: 100%">
+                                        <el-option
+                                            v-for="item in allActors"
+                                            :key="item.actorId"
+                                            :label="item.name"
+                                            :value="item.actorId"
+                                        />
+                                    </el-select>
+                                </template>
+                            </el-table-column>
+                            
+                            <el-table-column label="饰演角色">
+                                <template #default="scope">
+                                    <el-input v-model="scope.row.roleName" placeholder="输入角色名" />
+                                </template>
+                            </el-table-column>
+
+                            <el-table-column label="操作" width="60" align="center">
+                                <template #default="scope">
+                                    <el-button type="danger" icon="Delete" circle size="small" @click="removeActorRow(scope.$index)" />
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
                 </el-form-item>
                 <el-form-item label="年份">
                     <el-input-number v-model="form.releaseYear" :min="1900" :max="2030"/>
