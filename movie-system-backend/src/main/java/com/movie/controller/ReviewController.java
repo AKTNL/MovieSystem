@@ -113,4 +113,17 @@ public class ReviewController {
         movieService.refreshRating(movieId);
         return Result.success(null);
     }
+
+    @PostMapping("/like/{reviewId}")
+    public Result<Integer> like(@PathVariable Long reviewId, @RequestHeader(value = "userId", required = false) String userIdStr) {
+        if (userIdStr == null) {
+            return Result.error("请先登录");
+        }
+        Long userId = Long.parseLong(userIdStr);
+
+        // 执行逻辑，返回最新的点赞数
+        Integer newCount = reviewService.toggleLike(reviewId, userId);
+
+        return Result.success(newCount);
+    }
 }

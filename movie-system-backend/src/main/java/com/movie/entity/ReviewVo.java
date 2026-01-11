@@ -12,4 +12,7 @@ public class ReviewVo {
     private Integer score;
     private String content;
     private LocalDateTime createTime;
+
+    private Integer likeCount; // 总点赞数
+    private Boolean isLiked;   // 当前登录用户是否已点赞
 }

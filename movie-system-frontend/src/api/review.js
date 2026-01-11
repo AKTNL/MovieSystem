@@ -28,3 +28,7 @@ export function updateReview(data) {
 export function deleteReviewByAdmin(reviewId) {
     return request.delete('/review/admin/delete/' + reviewId)
 }
+
+export function toggleLike(reviewId) {
+    return request.post('/review/like/' + reviewId)
+}

@@ -3,7 +3,7 @@ import { ref, onMounted, computed, reactive } from 'vue'
 import { useRoute } from 'vue-router';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { getMovieDetail, getMovieActors, getMovieDirectors } from '../api/movie';
-import { getReviewList, addReview, deleteReview, updateReview } from '../api/review';
+import { getReviewList, addReview, deleteReview, updateReview, toggleLike } from '../api/review';
 
 const route = useRoute()
 
@@ -180,6 +180,40 @@ const submitEditReview = () => {
     }
   })
 }
+
+const handleLike = (item) => {
+    // 1. 没登录提示
+    if (!user.userId) {
+        ElMessage.warning('请先登录后点赞')
+        return
+    }
+
+    // 2. 乐观更新 (Optimistic UI)：不等后端返回，直接先改界面，体验更丝滑
+    const originalLiked = item.isLiked
+    const originalCount = item.likeCount || 0
+
+    // 切换状态
+    item.isLiked = !item.isLiked
+    // 更新数量
+    item.likeCount = item.isLiked ? originalCount + 1 : originalCount - 1
+
+    // 3. 发送请求
+    toggleLike(item.reviewId).then(res => {
+        if (res.code === 200) {
+            // 后端返回了最新的准确数量，同步一下
+            item.likeCount = res.data 
+        } else {
+            // 失败了？回滚状态
+            item.isLiked = originalLiked
+            item.likeCount = originalCount
+            ElMessage.error(res.msg)
+        }
+    }).catch(() => {
+        // 网络错误也要回滚
+        item.isLiked = originalLiked
+        item.likeCount = originalCount
+    })
+}
 </script>
 
 <template>
@@ -270,6 +304,21 @@ const submitEditReview = () => {
                 </div>
               </div>
               <div class="review-content">{{ item.content }}</div>
+              <div class="review-footer">
+                
+                <!-- 点赞按钮 (所有人可见) -->
+                <div 
+                  class="like-btn" 
+                  :class="{ active: item.isLiked }" 
+                  @click="handleLike(item)"
+                >
+                  <!-- 使用 SVG 绘制爱心图标 -->
+                  <el-icon size="16">
+                    <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="200" height="200"><path d="M725.333333 192c-89.6 0-168.533333 44.8-213.333333 115.2C467.2 236.8 388.266667 192 298.666667 192 157.866667 192 42.666667 307.2 42.666667 448c0 253.866667 469.333333 512 469.333333 512s469.333333-258.133333 469.333333-512c0-140.8-115.2-256-256-256z" :fill="item.isLiked ? '#f56c6c' : 'currentColor'"></path></svg>
+                  </el-icon>
+                  <span class="like-count">{{ item.likeCount || 0 }}</span>
+                </div>
+              </div>
               <div v-if="user.userId && item.username === user.username" class="review-actions">
                 <el-button link type="primary" icon="Edit" @click="handleEditReview(item)">修改</el-button>
                 <el-button link type="danger" icon="Delete" @click="handleDeleteReview(item.reviewId)">删除</el-button>
@@ -600,5 +649,45 @@ const submitEditReview = () => {
 .ghost-select :deep(.el-input__inner) {
     color: #64748b !important; /* 使用较淡的灰色 */
     font-weight: 500;
+}
+
+/* 底部操作栏布局 */
+.review-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+/* 点赞按钮样式 */
+.like-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: #94a3b8; /* 默认灰色 */
+  transition: all 0.3s;
+  user-select: none;
+  font-size: 14px;
+}
+
+.like-btn:hover {
+  color: #fca5a5; /* 悬浮浅红 */
+}
+
+/* 点赞激活状态 */
+.like-btn.active {
+  color: #f56c6c; /* 激活红色 */
+  font-weight: bold;
+}
+
+/* 点击时的微动画 */
+.like-btn:active {
+  transform: scale(0.9);
+}
+
+.action-btns {
+  display: flex;
+  gap: 10px;
 }
 </style>

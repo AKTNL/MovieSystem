@@ -17,4 +17,5 @@ public class Review {
     private Integer score;
     private String content;
     private LocalDateTime createTime;
+    private Integer likeCount; // 点赞数
 }
