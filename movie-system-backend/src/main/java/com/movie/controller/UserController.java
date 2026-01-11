@@ -8,6 +8,7 @@ import com.movie.entity.LoginDto;
 import com.movie.entity.PasswordDto;
 import com.movie.entity.Review;
 import com.movie.entity.User;
+import com.movie.service.MovieService;
 import com.movie.service.ReviewService;
 import com.movie.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/user")
@@ -29,6 +32,9 @@ public class UserController {
 
     @Autowired
     private ReviewService reviewService;
+
+    @Autowired
+    private MovieService movieService;
 
     //注册接口
     @PostMapping("/register")
@@ -158,7 +164,26 @@ public class UserController {
     @Auth("admin")
     @DeleteMapping("/delete/{id}")
     public Result<?> delete(@PathVariable Long id){
-        userService.removeById(id);
+        QueryWrapper<Review> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", id);
+        queryWrapper.select("movie_id"); // 只查 movie_id 字段即可
+        List<Review> reviews = reviewService.list(queryWrapper);
+
+        // 使用 Set 去重 (防止同一个用户对同一部电影有多条评论导致重复计算)
+        Set<Long> movieIds = reviews.stream()
+                .map(Review::getMovieId)
+                .collect(Collectors.toSet());
+
+        // 2. 删除用户 (数据库会自动级联删除 review 表里的数据)
+        boolean success = userService.removeById(id);
+
+        if (success) {
+            // 3. 【关键步骤】遍历受影响的电影，强制刷新它们的评分
+            for (Long movieId : movieIds) {
+                // 调用我们在上一问中写的 refreshRating 方法
+                movieService.refreshRating(movieId);
+            }
+        }
         return Result.success(null);
     }
 }

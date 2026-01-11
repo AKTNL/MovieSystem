@@ -5,13 +5,18 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.movie.entity.Movie;
 import com.movie.entity.MovieActor;
 import com.movie.entity.MovieDirector;
+import com.movie.entity.Review;
 import com.movie.mapper.MovieActorMapper;
 import com.movie.mapper.MovieDirectorMapper;
 import com.movie.mapper.MovieMapper;
+import com.movie.mapper.ReviewMapper;
 import com.movie.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class MovieServiceImpl extends ServiceImpl<MovieMapper, Movie> implements MovieService {
@@ -19,6 +24,8 @@ public class MovieServiceImpl extends ServiceImpl<MovieMapper, Movie> implements
     private MovieActorMapper movieActorMapper;
     @Autowired
     private MovieDirectorMapper movieDirectorMapper;
+    @Autowired
+    private ReviewMapper reviewMapper;
 
     @Override
     @Transactional // 开启事务，保证同时成功或同时失败
@@ -74,5 +81,26 @@ public class MovieServiceImpl extends ServiceImpl<MovieMapper, Movie> implements
                 movieDirectorMapper.insert(new MovieDirector(movie.getMovieId(), directorId));
             }
         }
+    }
+    @Override
+    public void refreshRating(Long movieId) {
+        // 1. 计算总人数
+        long count = reviewMapper.selectCount(new QueryWrapper<Review>().eq("movie_id", movieId));
+
+        // 2. 计算平均分
+        List<Review> reviews = reviewMapper.selectList(new QueryWrapper<Review>().eq("movie_id", movieId));
+        double avg = 0.0;
+        if (!reviews.isEmpty()) {
+            double sum = reviews.stream().mapToInt(Review::getScore).sum();
+            avg = Math.round((sum / count) * 10.0) / 10.0; // 保留1位小数
+        }
+
+        // 3. 更新电影表
+        Movie movie = new Movie();
+        movie.setMovieId(movieId);
+        movie.setRatingCount((int) count);
+        movie.setRating(BigDecimal.valueOf(avg));
+
+        updateById(movie);
     }
 }

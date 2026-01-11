@@ -6,6 +6,7 @@ import com.movie.entity.AdminReviewVo;
 import com.movie.entity.Review;
 import com.movie.entity.ReviewVo;
 import com.movie.mapper.ReviewMapper;
+import com.movie.service.MovieService;
 import com.movie.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,8 @@ public class ReviewController {
     private ReviewService reviewService;
     @Autowired
     private ReviewMapper reviewMapper;
+    @Autowired
+    private MovieService movieService;
 
     //提交评论
     @PostMapping("/add")
@@ -50,7 +53,10 @@ public class ReviewController {
     @Auth("admin")
     @DeleteMapping("/admin/delete/{id}")
     public Result<?> delete(@PathVariable Long id){
+        Review review = reviewService.getById(id);
+        Long movieId = review.getMovieId();
         reviewService.removeById(id);
+        movieService.refreshRating(movieId);
         return Result.success(null);
     }
 
@@ -90,6 +96,8 @@ public class ReviewController {
             return Result.success(null);
         }
 
+        Long movieId = review.getMovieId();
+
         // 2. 校验身份
         if (userIdStr != null) {
             Long currentUserId = Long.parseLong(userIdStr);
@@ -102,6 +110,7 @@ public class ReviewController {
         }
 
         reviewService.removeById(id);
+        movieService.refreshRating(movieId);
         return Result.success(null);
     }
 }

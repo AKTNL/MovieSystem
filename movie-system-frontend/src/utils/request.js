@@ -7,9 +7,16 @@ const request = axios.create({
 
 // 请求拦截器
 request.interceptors.request.use(config => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}')
     const token = localStorage.getItem('token')
     if (token) {
         config.headers['token'] = token // 把 token 放入请求头
+    }
+    if (user.userId) {
+        config.headers['userId'] = user.userId
+    }
+    if (user.role) {
+        config.headers['userRole'] = user.role
     }
     return config
 }, error => {

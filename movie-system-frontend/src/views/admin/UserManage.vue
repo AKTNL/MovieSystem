@@ -14,7 +14,12 @@ onMounted(() => {
 const loadUsers = () => { 
     loading.value = true
     getAllUsers().then(res => {
-        tableData.value = res.data
+        // 如果 res.data 是空或者 null，赋值为空数组 []
+        tableData.value = res.data || [] 
+    }).catch(err => {
+        console.error("加载失败", err)
+        tableData.value = [] // 发生异常也要保证它是数组
+    }).finally(() => {
         loading.value = false
     })
 }
@@ -48,7 +53,7 @@ const handleDelete = (id) => {
                 </div>
             </div>
             <div class="bar-right">
-                <span class="stat-tag">活跃终端: {{ tableData.length }}</span>
+                <span class="stat-tag">活跃终端: {{ tableData.length || 0 }}</span>
             </div>
         </div>
 

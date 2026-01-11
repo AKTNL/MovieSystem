@@ -8,4 +8,6 @@ public interface MovieService extends IService<Movie> {
     void saveMovie(Movie movie);
     //修改带有演职员的电影
     void updateMovie(Movie movie);
+    //重新计算某部电影的评分
+    void refreshRating(Long movieId);
 }

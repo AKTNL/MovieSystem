@@ -301,6 +301,35 @@ const submitEditReview = () => {
         </el-col>
       </el-row>
     </div>
+    <el-dialog 
+      v-model="editDialogVisible" 
+      title="修改评价" 
+      width="500px"
+      class="dark-dialog" 
+    >
+      <div style="margin-bottom: 20px;">
+        <span style="color: #94a3b8; margin-right: 10px;">修改评分：</span>
+        <el-rate 
+          v-model="editForm.score" 
+          :max="5" 
+          allow-half 
+          show-text 
+          :texts="['极差', '失望', '一般', '满意', '神作']" 
+        />
+      </div>
+      <el-input
+        v-model="editForm.content"
+        type="textarea"
+        :rows="4"
+        maxlength="500"
+        show-word-limit
+        placeholder="修改你的评论..."
+      />
+      <template #footer>
+        <el-button @click="editDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitEditReview">保存修改</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 

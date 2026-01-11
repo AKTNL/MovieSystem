@@ -28,5 +28,5 @@ export function getAllUsers() {
 }
 
 export function deleteUser(userId) {
-    return request.delete('/user/' + userId)
+    return request.delete('/user/delete/' + userId)
 }
