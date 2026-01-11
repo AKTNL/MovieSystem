@@ -70,6 +70,7 @@ const loadMovieInfo = () => {
     getMovieDetail(movieId).then(res => {
         if (res.code === 200) {
             movie.value = res.data
+            document.title = `${movie.value.title} - 电影详情`
         } else {
             ElMessage.error("获取电影详情失败：" + res.msg)
         }

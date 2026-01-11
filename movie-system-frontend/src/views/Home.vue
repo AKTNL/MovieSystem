@@ -70,7 +70,7 @@ const loadGenres = () => {
                             </el-select>
                         </el-form-item>
 
-                        <!-- 2. 【新增】排序方式 -->
+                        <!-- 2. 排序方式 -->
                         <el-form-item label="排序">
                             <el-select v-model="searchForm.sort" @change="loadMovies" style="width: 120px;">
                                 <template #prefix><el-icon><Sort /></el-icon></template>

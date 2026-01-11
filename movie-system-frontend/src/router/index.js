@@ -19,7 +19,8 @@ const routes = [
     {
         path: '/login',
         name: 'Login',
-        component: LoginView
+        component: LoginView,
+        meta: { title: '用户登录' }
     },
     {
         path: '/',
@@ -30,38 +31,45 @@ const routes = [
             {
                 path: 'home',
                 name: 'Home',
-                component: HomeView
+                component: HomeView,
+                meta: { title: '首页' }
             },
             {
                 path: '/movie/:id',
                 name: 'MovieDetail',
-                component: MovieDetailView
+                component: MovieDetailView,
+                meta: { title: '电影详情' }
             },
             {
                 path: 'user-center',
                 name: 'UserCenter',
-                component: UserCenterView
+                component: UserCenterView,
+                meta: { title: '个人中心' }
             },
             {
                 path: '/actor/:id',
                 name: 'ActorDetail',
-                component: ActorDetailView
+                component: ActorDetailView,
+                meta: { title: '演员详情' }
             },
             {
                 path: '/director/:id',
                 name: 'DirectorDetail',
-                component: DirectorDetailView
+                component: DirectorDetailView,
+                meta: { title: '导演详情' }
             },
             {
                 path: '/search',
                 name: 'SearchResult',
-                component: SearchResultView
+                component: SearchResultView,
+                meta: { title: '搜索结果' }
             }
         ]
     },
     {
         path: '/admin',
         component: AdminLayoutView,
+        meta: { title: '管理员' },
         redirect: '/admin/dashboard',
         //路由守卫：只有管理员能进
         beforeEnter: (to, from, next) => {
@@ -77,32 +85,38 @@ const routes = [
             {
                 path: 'dashboard',
                 name: 'Dashboard',
-                component: DashboardView
+                component: DashboardView,
+                meta: { title: '系统概览' }
             },
             {
                 path: 'movie',
                 name: 'AdminMovie',
-                component: MovieManageView
+                component: MovieManageView,
+                meta: { title: '电影管理' }
             },
             {
                 path: 'actor',
                 name: 'ActorManage',
-                component: ActorManageView
+                component: ActorManageView,
+                meta: { title: '演员管理' }
             },
             {
                 path: 'director',
                 name: 'DirectorManage',
-                component: DirectorManageView
+                component: DirectorManageView,
+                meta: { title: '导演管理' }
             },
             {
                 path: 'user',
                 name: 'UserManage',
-                component: UserManageView
+                component: UserManageView,
+                meta: { title: '用户管理' }
             },
             {
                 path: 'review',
                 name: 'ReviewManage',
-                component: ReviewManageView
+                component: ReviewManageView,
+                meta: { title: '影评管理' }
             }
         ]
     }
@@ -111,6 +125,16 @@ const routes = [
 const router = createRouter({
     history: createWebHistory(),
     routes
+})
+
+router.beforeEach((to, from, next) => {
+    // 如果路由有 meta.title，就设置文档标题
+    if (to.meta.title) {
+        document.title = `${to.meta.title} - 电影评分系统`
+    } else {
+        document.title = '电影评分系统' // 默认标题
+    }
+    next()
 })
 
 export default router
