@@ -1,5 +1,6 @@
 package com.movie.common;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -19,6 +20,17 @@ public class AuthAspect {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
 
+        String token = request.getHeader("token");
+        if (token == null || token.isEmpty()) {
+            throw new RuntimeException("401"); // 抛出特定异常，稍后在全局异常处理捕获
+        }
+        Claims claims;
+        try {
+            claims = JwtUtils.parseToken(token);
+        } catch (Exception e) {
+            throw new RuntimeException("401"); // Token 无效
+        }
+
         // 2. 获取前端传来的角色信息
         String userRole = request.getHeader("userRole");
 
@@ -27,7 +39,7 @@ public class AuthAspect {
 
         // 4. 鉴权逻辑
         if("admin".equals(requiredRole) && !"admin".equals(userRole)){
-            throw new RuntimeException("无权访问，需要管理员身份");
+            throw new RuntimeException("403");
         }
 
         // 5. 验证通过，放行，执行原来的 Controller 方法

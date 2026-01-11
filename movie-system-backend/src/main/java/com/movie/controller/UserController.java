@@ -2,6 +2,7 @@ package com.movie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.movie.common.Auth;
+import com.movie.common.JwtUtils;
 import com.movie.common.Result;
 import com.movie.entity.LoginDto;
 import com.movie.entity.PasswordDto;
@@ -42,7 +43,7 @@ public class UserController {
 
     //登录接口
     @PostMapping("/login")
-    public Result<User> login(@RequestBody LoginDto loginDto){
+    public Result<Map<String, Object>> login(@RequestBody LoginDto loginDto){
         //校验验证码
         String uuid = loginDto.getUuid();
         String userCode = loginDto.getCode();
@@ -68,7 +69,11 @@ public class UserController {
 
         try{
             User loginUser = userService.login(loginDto.getUsername(), loginDto.getPassword());
-            return Result.success(loginUser);
+            String token = JwtUtils.createToken(loginUser.getUserId(), loginUser.getRole());
+            Map<String, Object> map = new HashMap<>();
+            map.put("token", token);
+            map.put("user", loginUser);
+            return Result.success(map);
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }

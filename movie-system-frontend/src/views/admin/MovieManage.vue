@@ -254,6 +254,11 @@ const getRatingColor = (score) => {
                                 </el-form-item>
                             </el-col>
                             <el-col :span="12">
+                                <el-form-item label="制片国家/地区">
+                                    <el-input v-model="form.country" placeholder="如：美国 / 中国" />
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
                                 <el-form-item label="对白语言">
                                     <el-input v-model="form.language" placeholder="主要使用语言" />
                                 </el-form-item>

@@ -14,6 +14,7 @@ const msgList = ref([])
 const logout = () => {
     if (socket) socket.close()
     localStorage.removeItem('user')
+    localStorage.removeItem('token')
     router.push('/login')
 }
 
@@ -83,13 +84,13 @@ onUnmounted(() => {
         </div>
 
         <div class="actions">
-          <el-badge :value="msgCount" :hidden="msgCount === 0" class="msg-badge">
+          <el-badge v-if="user.userId" :value="msgCount" :hidden="msgCount === 0" class="msg-badge">
             <el-button link class="action-btn" @click="showMsgBox">
               <el-icon><Bell /></el-icon>
             </el-button>
           </el-badge>
 
-          <el-dropdown trigger="click">
+          <el-dropdown v-if="user.userId" trigger="click">
             <div class="user-info">
               <el-avatar :size="32" class="avatar-placeholder">
                 {{ (user.nickname || user.username || 'U').charAt(0).toUpperCase() }}
@@ -115,6 +116,12 @@ onUnmounted(() => {
               </el-dropdown-menu>
             </template>
           </el-dropdown>
+          <div v-else class="guest-login" @click="$router.push('/login')">
+            <el-avatar :size="32" class="guest-avatar">
+              <el-icon><User /></el-icon>
+            </el-avatar>
+            <span class="guest-text">登录 / 注册</span>
+          </div>
         </div>
       </div>
     </el-header>

@@ -59,8 +59,9 @@ const handleLogin = () => {
     login(loginForm).then(res => {
         if (res.code === 200) {
             ElMessage.success('登录成功')
+            localStorage.setItem('token', res.data.token) // 单独存 token
             // 把用户信息存到浏览器缓存
-            localStorage.setItem('user', JSON.stringify(res.data))
+            localStorage.setItem('user', JSON.stringify(res.data.user))
             router.push('/') // 跳转到首页
         } else {
             ElMessage.error(res.msg)

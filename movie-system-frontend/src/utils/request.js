@@ -7,10 +7,9 @@ const request = axios.create({
 
 // 请求拦截器
 request.interceptors.request.use(config => {
-    const user = JSON.parse(localStorage.getItem('user') || '{}')
-    if (user.userId) {
-        config.headers['userId'] = user.userId
-        config.headers['userRole'] = user.role // 传角色给后端
+    const token = localStorage.getItem('token')
+    if (token) {
+        config.headers['token'] = token // 把 token 放入请求头
     }
     return config
 }, error => {
@@ -27,6 +26,13 @@ request.interceptors.response.use(response => {
     // 兼容服务端返回的字符串数据
     if (typeof res === 'string') {
         res = res ? JSON.parse(res) : res
+    }
+    if (res.code === 401) {
+        // 清除缓存
+        localStorage.removeItem('user')
+        localStorage.removeItem('token')
+        // 跳转登录页
+        location.href = '/login'
     }
     return res;
 }, error => {
