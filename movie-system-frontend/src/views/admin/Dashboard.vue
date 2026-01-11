@@ -17,120 +17,257 @@ const loadStats = () => {
     getStatistics().then(res => {
         if (res.code === 200) {
             stats.value = res.data
-            //数据加载完后初始化图表
-            initGenreChart(res.data.genreData)
+            // 确保 DOM 加载后初始化
+            setTimeout(() => {
+                initGenreChart(res.data.genreData)
+            }, 0)
         }
     })
 }
 
 const initGenreChart = (data) => { 
-    //获取DOM元素
     const chartDom = document.getElementById('genreChart')
-
+    if (!chartDom) return
     const myChart = echarts.init(chartDom)
 
     const option = {
-    // 【优化1】自定义配色：清新风格
-    color: [
-      '#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', 
-      '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc'
-    ],
-    title: {
-      text: '类型分布',
-      left: 'center',
-      top: 'center',
-      textStyle: { color: '#999', fontSize: 14 }
-    },
-    tooltip: {
-      trigger: 'item',
-      // 【优化2】显示百分比：剧情: 10 (25%)
-      formatter: '{b}: {c} ({d}%)' 
-    },
-    legend: {
-      type: 'scroll', // 【优化3】如果类型还是很多，允许图例滚动
-      bottom: '0%',
-      left: 'center'
-    },
-    series: [
-      {
-        name: '电影类型',
-        type: 'pie',
-        radius: ['40%', '70%'], // 甜甜圈
-        avoidLabelOverlap: true, // 防止标签重叠
-        itemStyle: {
-          borderRadius: 10, // 圆角扇形
-          borderColor: '#fff',
-          borderWidth: 2
+        // 【高级感配色】使用高饱和度的荧光色系
+        color: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'],
+        tooltip: {
+            trigger: 'item',
+            backgroundColor: '#1e293b',
+            borderColor: '#334155',
+            textStyle: { color: '#f1f5f9' },
+            formatter: '{b}: <b style="color:#3b82f6">{c}</b> ({d}%)' 
         },
-        label: {
-          show: true,
-          formatter: '{b}' // 默认只显示名字，鼠标放上去显示详情
+        legend: {
+            type: 'scroll',
+            bottom: '5%',
+            left: 'center',
+            textStyle: { color: '#94a3b8' },
+            pageTextStyle: { color: '#fff' }
         },
-        emphasis: {
-          label: {
-            show: true,
-            fontSize: 16,
-            fontWeight: 'bold'
-          },
-          itemStyle: {
-            shadowBlur: 10,
-            shadowOffsetX: 0,
-            shadowColor: 'rgba(0, 0, 0, 0.5)'
-          }
-        },
-        data: data
-      }
-    ]
-  }
+        series: [
+            {
+                name: '电影类型',
+                type: 'pie',
+                radius: ['50%', '75%'], // 稍微加粗甜甜圈
+                center: ['50%', '45%'],
+                avoidLabelOverlap: true,
+                itemStyle: {
+                    borderRadius: 8,
+                    borderColor: '#1e293b', // 边框颜色与卡片背景一致，制造镂空感
+                    borderWidth: 3
+                },
+                label: {
+                    show: false, // 默认隐藏，emphasis 时显示
+                    position: 'center'
+                },
+                emphasis: {
+                    label: {
+                        show: true,
+                        fontSize: 20,
+                        fontWeight: 'bold',
+                        color: '#f1f5f9',
+                        formatter: '{b}\n{d}%'
+                    }
+                },
+                data: data
+            }
+        ]
+    }
     myChart.setOption(option)
-    // 跟随窗口大小自动缩放
-    window.addEventListener('resize', () => {
-    myChart.resize()
-  })
+    window.addEventListener('resize', () => myChart.resize())
 }
 </script>
 
 <template>
-    <div>
-        <!--数据卡片区域-->
-        <el-row :gutter="20" style="margin-bottom: 20px;">
+    <div class="dashboard-container">
+        <el-row :gutter="25" class="stat-row">
             <el-col :span="8">
-                <el-card shadow="hover" style="background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%); color: white;">
-                    <div style="font-size: 16px;">🎬 电影总数</div>
-                    <div style="font-size: 30px; font-weight: bold; margin-top: 10px;">{{ stats.movieCount }}</div>
-                </el-card> 
+                <div class="stat-glass-card blue">
+                    <div class="icon-box"><el-icon><Film /></el-icon></div>
+                    <div class="stat-info">
+                        <div class="label">电影库总数</div>
+                        <div class="value">{{ stats.movieCount.toLocaleString() }}</div>
+                    </div>
+                    <div class="decoration"></div>
+                </div> 
             </el-col>
             <el-col :span="8"> 
-                <el-card shadow="hover" style="background: linear-gradient(to right, #43e97b 0%, #38f9d7 100%); color: white;">
-                    <div style="font-size: 16px;">👥 用户总数</div>
-                    <div style="font-size: 30px; font-weight: bold; margin-top: 10px;">{{ stats.userCount }}</div>
-                </el-card>
+                <div class="stat-glass-card green">
+                    <div class="icon-box"><el-icon><User /></el-icon></div>
+                    <div class="stat-info">
+                        <div class="label">活跃用户</div>
+                        <div class="value">{{ stats.userCount.toLocaleString() }}</div>
+                    </div>
+                    <div class="decoration"></div>
+                </div>
             </el-col> 
             <el-col :span="8"> 
-                <el-card shadow="hover" style="background: linear-gradient(to right, #fa709a 0%, #fee140 100%); color: white;">
-                    <div style="font-size: 16px;">📝 评论总数</div>
-                    <div style="font-size: 30px; font-weight: bold; margin-top: 10px;">{{ stats.reviewCount }}</div>
-                </el-card>
+                <div class="stat-glass-card orange">
+                    <div class="icon-box"><el-icon><ChatDotSquare /></el-icon></div>
+                    <div class="stat-info">
+                        <div class="label">影评累计</div>
+                        <div class="value">{{ stats.reviewCount.toLocaleString() }}</div>
+                    </div>
+                    <div class="decoration"></div>
+                </div>
             </el-col>
         </el-row>
 
-        <!--图表区域-->
-        <el-row :gutter="20"> 
-            <el-col :span="12">
-                <el-card header="电影类型分布">
-                    <!-- ECharts 容器，必须给高度 -->
-                    <div id="genreChart" style="width: 100%; height: 400px;"></div>
-                </el-card>
-            </el-col>
-            <el-col :span="12">
-                <el-card header="系统说明">
-                    <div style="line-height: 2; color: #666;">
-                        <p>欢迎进入电影评分系统后台管理。</p>
-                        <p>这里展示了系统的核心数据概览。</p>
-                        <p>左侧饼图实时反映了当前库中不同类型电影的比例。</p>
+        <el-row :gutter="25"> 
+            <el-col :span="14">
+                <div class="chart-card">
+                    <div class="card-header">
+                        <span class="title">电影类型分布</span>
+                        <span class="subtitle">实时数据分析</span>
                     </div>
-                </el-card>
+                    <div id="genreChart" class="echarts-box"></div>
+                </div>
+            </el-col>
+            <el-col :span="10">
+                <div class="info-card">
+                    <div class="card-header">
+                        <span class="title">管理终端说明</span>
+                    </div>
+                    <div class="system-tips">
+                        <div class="tip-item">
+                            <div class="dot blue"></div>
+                            <p><strong>数据同步：</strong> 所有统计每 5 分钟自动更新一次。</p>
+                        </div>
+                        <div class="tip-item">
+                            <div class="dot green"></div>
+                            <p><strong>安全审计：</strong> 所有操作将被记录在管理员日志中。</p>
+                        </div>
+                        <div class="tip-item">
+                            <div class="dot orange"></div>
+                            <p><strong>内容风控：</strong> 评论系统已接入非法词库自动拦截。</p>
+                        </div>
+                        <div class="welcome-text">
+                            欢迎回来，管理员。系统运行状态：<span class="status">良好</span>
+                        </div>
+                    </div>
+                </div>
             </el-col>
         </el-row>
     </div>
 </template>
+
+<style scoped>
+.dashboard-container {
+    padding: 10px 0;
+}
+
+/* --- 顶部玻璃态卡片 --- */
+.stat-glass-card {
+    position: relative;
+    height: 120px;
+    background: #1e293b;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    padding: 0 30px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s;
+}
+
+.stat-glass-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.icon-box {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-right: 20px;
+    z-index: 2;
+}
+
+.stat-info { z-index: 2; }
+.stat-info .label { color: #64748b; font-size: 14px; margin-bottom: 5px; }
+.stat-info .value { color: #f1f5f9; font-size: 28px; font-weight: 800; font-family: 'Arial'; }
+
+/* 三种颜色风格 */
+.blue .icon-box { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+.green .icon-box { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.orange .icon-box { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+
+.decoration {
+    position: absolute;
+    right: -20px;
+    bottom: -20px;
+    width: 100px;
+    height: 100px;
+    background: currentColor;
+    opacity: 0.03;
+    border-radius: 50%;
+}
+
+/* --- 图表卡片美化 --- */
+.chart-card, .info-card {
+    background: #1e293b;
+    border-radius: 20px;
+    padding: 30px;
+    height: 500px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card-header {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header .title { color: #f1f5f9; font-size: 18px; font-weight: 600; }
+.card-header .subtitle { color: #64748b; font-size: 12px; margin-top: 4px; }
+
+.echarts-box {
+    width: 100%;
+    height: 380px;
+}
+
+/* --- 系统说明区美化 --- */
+.system-tips {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.tip-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    background: rgba(15, 23, 42, 0.4);
+    padding: 15px;
+    border-radius: 12px;
+}
+
+.tip-item p { margin: 0; font-size: 13px; color: #94a3b8; line-height: 1.6; }
+.tip-item strong { color: #f1f5f9; display: block; margin-bottom: 2px; }
+
+.dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+.dot.blue { background: #3b82f6; box-shadow: 0 0 10px #3b82f6; }
+.dot.green { background: #10b981; box-shadow: 0 0 10px #10b981; }
+.dot.orange { background: #f59e0b; box-shadow: 0 0 10px #f59e0b; }
+
+.welcome-text {
+    margin-top: 20px;
+    text-align: center;
+    color: #64748b;
+    font-size: 14px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.welcome-text .status {
+    color: #10b981;
+    font-weight: bold;
+}
+</style>

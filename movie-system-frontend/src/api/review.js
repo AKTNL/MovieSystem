@@ -10,7 +10,7 @@ export function addReview(data) {
     return request.post('/review/add', data)
 }
 
-//删除评论
+//用户删除自己的评论
 export function deleteReview(reviewId) {
     return request.delete('/review/delete/' + reviewId)
 }
@@ -18,4 +18,13 @@ export function deleteReview(reviewId) {
 //管理员获取所有评论
 export function getAllReviews() {
     return request.get('/review/listAll')
+}
+
+export function updateReview(data) {
+    return request.post('/review/update', data)
+}
+
+//管理员强制删除评论
+export function deleteReviewByAdmin(reviewId) {
+    return request.delete('/review/admin/delete/' + reviewId)
 }

@@ -22,9 +22,14 @@ export function getMovieDirectors(movieId) {
 
 //删除电影
 export function deleteMovie(movieId) {
-    return request.delete('/delete/' + movieId)
+    return request.delete('movie/delete/' + movieId)
 }
 
 export function getHotMovies() {
     return request.get('/movie/hot')
+}
+
+// 获取所有电影类型
+export function getMovieGenres() {
+    return request.get('/movie/genres')
 }

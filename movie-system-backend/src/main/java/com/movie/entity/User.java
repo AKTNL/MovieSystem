@@ -18,6 +18,7 @@ public class User {
     private String avatar;
     private String email;
     private String phone;
+    private String bio;
     private Integer status; //0:禁用 1:正常
     private LocalDateTime createTime;
     private String role; // user 或 admin
