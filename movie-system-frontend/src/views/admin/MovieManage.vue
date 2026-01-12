@@ -38,7 +38,12 @@ onMounted(() => {
 
 const load = () => {
     loading.value = true
-    getMovieList().then(res => {
+
+    const params = {
+        title: searchText.value // 后端接收的是 title 字段
+    }
+
+    getMovieList(params).then(res => {
         if (res.code === 200) {
             tableData.value = res.data
         }
@@ -143,6 +148,9 @@ const getRatingColor = (score) => {
                     placeholder="搜索电影名称/导演..." 
                     class="dark-input"
                     :prefix-icon="Search"
+                    clearable
+                    @clear="load" 
+                    @keyup.enter="load"
                 />
                 <el-button class="refresh-btn" @click="load" :icon="VideoCamera">同步数据库</el-button>
             </div>
