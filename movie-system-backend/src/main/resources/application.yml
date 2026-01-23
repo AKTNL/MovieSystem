@@ -6,7 +6,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/movie_rating_system?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: root
-    password: ck041121
+    password: "{password}"
     type: com.alibaba.druid.pool.DruidDataSource
 
   elasticsearch:
@@ -31,3 +31,6 @@ minio:
   access-key: admin
   secret-key: password
   bucket-name: movie-system
+
+zhipu:
+  api-key: "{api-key}"

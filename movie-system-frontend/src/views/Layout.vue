@@ -1,8 +1,9 @@
 <script setup>
-import { Monitor, User, Search, Bell, ArrowDown } from '@element-plus/icons-vue';
+import { Monitor, User, Search, Bell, ArrowDown, Promotion, CloseBold, Loading } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { ElNotification, ElMessageBox } from 'element-plus';
+import request from '../utils/request';
 
 const router = useRouter()
 let socket = null
@@ -10,6 +11,10 @@ let socket = null
 const user = JSON.parse(localStorage.getItem('user') || '{}')
 const msgCount = ref(0)
 const msgList = ref([])
+
+const getUserAvatar = () => {
+  return user.avatar || '';
+}
 
 const logout = () => {
     if (socket) socket.close()
@@ -61,6 +66,53 @@ onMounted(() => {
 onUnmounted(() => {
     if (socket) socket.close()
 })
+
+// --- AI 聊天逻辑 ---
+const showChat = ref(false)
+const userQuestion = ref('')
+const aiLoading = ref(false)
+const chatBodyRef = ref(null)
+const chatHistory = ref([
+  { role: 'ai', content: '你好！我是小影，想看什么电影？我可以帮你推荐哦~' }
+])
+
+const toggleChat = () => {
+  showChat.value = !showChat.value
+}
+
+const sendToAi = () => {
+  if (!userQuestion.value.trim() || aiLoading.value) return
+
+  const question = userQuestion.value
+  chatHistory.value.push({ role: 'user', content: question })
+  userQuestion.value = ''
+  aiLoading.value = true
+  
+  scrollToBottom()
+
+  request.get('/ai/chat', {
+    params: { message: question },
+    timeout: 500000
+  }).then(res => {
+    if (res.code === 200) {
+      chatHistory.value.push({ role: 'ai', content: res.data })
+    } else {
+      chatHistory.value.push({ role: 'ai', content: '通讯链路故障，请稍后再试。' })
+    }
+  }).finally(() => {
+    aiLoading.value = false
+    scrollToBottom()
+  })
+}
+
+// 自动滚动到底部
+const scrollToBottom = () => {
+  setTimeout(() => {
+    if (chatBodyRef.value) {
+      chatBodyRef.value.scrollTop = chatBodyRef.value.scrollHeight
+    }
+  }, 100)
+}
 </script>
 
 <template>
@@ -135,6 +187,68 @@ onUnmounted(() => {
         </router-view>
       </div>
     </el-main>
+    
+    <!-- AI 悬浮球 -->
+    <div class="ai-pulse-wrapper" @click="toggleChat">
+        <div class="pulse-ring"></div>
+        <div class="ai-float-btn">
+            <span class="ai-icon">🤖</span>
+        </div>
+    </div>
+
+    <transition name="el-zoom-in-bottom">
+        <div v-if="showChat" class="chat-window-premium">
+          <div class="chat-header-modern">
+            <div class="title-area">
+                <span class="status-dot"></span>
+                <span>智能影评助手</span>
+            </div>
+            <el-icon class="close-icon" @click="showChat = false"><CloseBold /></el-icon>
+          </div>
+          
+          <div class="chat-body-modern" ref="chatBodyRef">
+            <div v-for="(msg, index) in chatHistory" :key="index" :class="['chat-msg', msg.role]">
+              <div class="msg-avatar">
+                <template v-if="msg.role === 'user'">
+                    <el-avatar :size="32" :src="user.avatar" class="user-avatar-shadow">
+                        {{ (user.nickname || user.username || 'U').charAt(0).toUpperCase() }}
+                    </el-avatar>
+                </template>
+                <div v-else class="ai-avatar-icon">🤖</div>
+              </div>
+              <div class="msg-content-wrapper">
+                  <div class="msg-content">{{ msg.content }}</div>
+              </div>
+            </div>
+
+            <div v-if="aiLoading" class="chat-msg ai">
+              <div class="msg-avatar"><div class="ai-avatar-icon">🤖</div></div>
+              <div class="msg-content-wrapper">
+                  <div class="typing-loader">
+                      <span></span><span></span><span></span>
+                  </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-footer-modern">
+            <el-input 
+              v-model="userQuestion" 
+              placeholder="输入你想探讨的电影问题..." 
+              @keyup.enter="sendToAi"
+              :disabled="aiLoading"
+            >
+              <template #suffix>
+                <el-icon 
+                    class="send-icon" 
+                    :class="{'is-active': userQuestion.length > 0}"
+                    @click="sendToAi"
+                ><Promotion /></el-icon>
+              </template>
+            </el-input>
+          </div>
+        </div>
+    </transition>
   </div>
 </template>
 
@@ -158,6 +272,7 @@ onUnmounted(() => {
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   padding: 0 5%;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 }
 
 .nav-content {
@@ -312,5 +427,188 @@ onUnmounted(() => {
 .logout-item:hover {
   background-color: rgba(239, 68, 68, 0.15) !important; /* 退出悬浮时变红 */
   color: #ef4444 !important;
+}
+
+/* --- AI 悬浮球呼吸灯 --- */
+.ai-pulse-wrapper {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 2001;
+  cursor: pointer;
+}
+.ai-float-btn {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.5);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.ai-pulse-wrapper:hover .ai-float-btn {
+  transform: scale(1.1) translateY(-5px);
+}
+.pulse-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #3b82f6;
+  border-radius: 50%;
+  animation: pulse-animation 2s infinite;
+  z-index: -1;
+}
+@keyframes pulse-animation {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* --- 聊天窗口美化 --- */
+.chat-window-premium {
+  position: fixed;
+  bottom: 100px;
+  right: 30px;
+  width: 380px;
+  height: 580px;
+  background: #1e293b;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  z-index: 2000;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.chat-header-modern {
+  padding: 18px 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.title-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #f8fafc;
+}
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #10b981;
+}
+.close-icon {
+    cursor: pointer;
+    color: #94a3b8;
+    transition: 0.3s;
+}
+.close-icon:hover { color: #f1f5f9; transform: rotate(90deg); }
+
+.chat-body-modern {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 消息气泡设计 */
+.chat-msg {
+  display: flex;
+  gap: 12px;
+  max-width: 90%;
+  animation: fadeIn 0.4s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-msg.user { align-self: flex-end; flex-direction: row-reverse; }
+.chat-msg.ai { align-self: flex-start; }
+
+.ai-avatar-icon {
+    width: 32px;
+    height: 32px;
+    background: #334155;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.msg-content {
+  padding: 12px 16px;
+  border-radius: 15px;
+  font-size: 14px;
+  line-height: 1.6;
+  position: relative;
+}
+.ai .msg-content { 
+    background: rgba(255, 255, 255, 0.05); 
+    color: #e2e8f0;
+    border-top-left-radius: 2px;
+}
+.user .msg-content { 
+    background: linear-gradient(135deg, #3b82f6, #2563eb); 
+    color: white; 
+    border-top-right-radius: 2px;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* 输入框区域 */
+.chat-footer-modern {
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.5);
+}
+:deep(.el-input__wrapper) {
+    background: rgba(255, 255, 255, 0) !important;
+    border-radius: 12px !important;
+    padding: 8px 15px !important;
+}
+:deep(.chat-footer-modern .el-input__inner) {
+  color: #fff !important;
+}
+.send-icon {
+    font-size: 20px;
+    color: #475569;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.send-icon.is-active {
+    color: #3b82f6;
+}
+
+/* 打字动画 */
+.typing-loader {
+    display: flex;
+    padding: 10px;
+    gap: 4px;
+}
+.typing-loader span {
+    width: 6px;
+    height: 6px;
+    background: #94a3b8;
+    border-radius: 50%;
+    animation: typing 1.4s infinite;
+}
+.typing-loader span:nth-child(2) { animation-delay: 0.2s; }
+.typing-loader span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing {
+    0%, 100% { transform: translateY(0); opacity: 0.4; }
+    50% { transform: translateY(-4px); opacity: 1; }
 }
 </style>

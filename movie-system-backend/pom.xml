@@ -146,6 +146,11 @@
             <version>4.0.4</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>ai.z.openapi</groupId>
+            <artifactId>zai-sdk</artifactId>
+            <version>0.3.0</version>
+        </dependency>
     </dependencies>
 
     <!-- 依赖版本管理器 -->
